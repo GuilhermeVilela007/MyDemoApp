@@ -1,71 +1,85 @@
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Android;
 using OpenQA.Selenium.Appium.Enums;
-using OpenQA.Selenium.Appium.Interfaces;
-
+using OpenQA.Selenium.Appium.MultiTouch;
 
 namespace appium;
 
-
 public class MyDemoApp
 {
+    // Atributos
+    public static string SAUCE_USERNAME = Environment.GetEnvironmentVariable("SAUCE_USERNAME");
+    public static string SAUCE_ACCESS_KEY = Environment.GetEnvironmentVariable("SAUCE_ACCESS_KEY");
+    public Uri URI = new Uri($"https://{SAUCE_USERNAME}:{SAUCE_ACCESS_KEY}@ondemand.us-west-1.saucelabs.com:443/wd/hub");
 
-  public static string SAUCE_USERNAME = Environment.GetEnvironmentVariable("SAUCE_USERNAME");
-  public static string SAUCE_ACCES_KEY = Environment.GetEnvironmentVariable("SAUCE_ACCES_KEY");
-  public Uri URI = new Uri($"https://{SAUCE_USERNAME}:{SAUCE_ACCESS_KEY}@ondemand.us-west-1.saucelabs.com:443/wd/hub");
+    public AndroidDriver<AndroidElement> driver { get; set; } // declara o objeto do Appium para leitura e gravação
 
-  [SetUp]
-   public void mobileSetup()
-  {
-    var options = new AppiumOptions(); 
+    // Funções e Métodos
+
+    [SetUp] // Inicializa - Antes do Teste
+    public void MobileBaseSetup() // Configurações de Inicialização para o Mobile
+    {
+        var options = new AppiumOptions(); // objeto que vai reunir as configurações
         options.AddAdditionalCapability(MobileCapabilityType.PlatformName, "Android");
         options.AddAdditionalCapability(MobileCapabilityType.PlatformVersion, "9.0");
         options.AddAdditionalCapability(MobileCapabilityType.DeviceName, "Samsung Galaxy S9 FHD GoogleAPI Emulator");
         options.AddAdditionalCapability(MobileCapabilityType.App, "storage:filename=mda-2.0.0-21.apk");
         options.AddAdditionalCapability("appPackage", "com.saucelabs.mydemoapp.android");
         options.AddAdditionalCapability("appActivity", "com.saucelabs.mydemoapp.android.view.activities.SplashActivity");
-        options.AddAdditionalCapability("newCommandTimeout", 90); 
- }
+        options.AddAdditionalCapability("newCommandTimeout", 90); // espera elementos por 90s
 
- driver = new AndroidDriver<AndroidElement>(remoteAddres:URI, driverOptions: options, commandTimeout: timeSpan.FromSeconds(180));
+        // Inicializa o Appium como Android
+        driver = new AndroidDriver<AndroidElement>(remoteAddress: URI, driverOptions: options, commandTimeout: TimeSpan.FromSeconds(180));
+    }
 
-   [TearDown] 
+    [TearDown] // Encerra - Depois do Teste
     public void Finalizar()
     {
-        if (driver == null) return; 
+        if (driver == null) return; // Se não tem o driver ativo, apenas termine o script
         driver.Quit();
     }
 
-  [Test]
-public void AddBackPack()
-  {
-   driver.FindElement(MobileBy.AndroidUIAutomator("new UiSelector().resourceId(\"com.saucelabs.mydemoapp.android:id/productIV\").instance(0)"));.Click(); 
+    [Test] // Teste em si
+    public void SelecionarProdutoMDA()
+    {
+        // É importante começar com uma linha que aguarda carregar algum elemento da página inicial do app 
+        Assert.That(driver.FindElement(MobileBy.AccessibilityId("App logo and name")).Displayed, Is.True);
 
-   String tituloProduto = driver.FindElement(MobileBy.Id("com.saucelabs.mydemoapp.android:id/productTV")).Text;
-   Assert.That(tituloProduto, Is.EqualTo("Sauce Labs Backpack"));
+        // Clicar no produto mochila
+        driver.FindElement(MobileBy.AccessibilityId("Sauce Labs Backpack")).Click();
 
-   String precoProduto = driver.FindElement(MobileBy.Id("com.saucelabs.mydemoapp.android:id/priceTV")).Text;
-   Assert.That(precoProduto, Is.EqualTo("$ 29.99"));
+        // Verificar o nome do produto na tela do produto
+        String tituloProduto = driver.FindElement(MobileBy.Id("com.saucelabs.mydemoapp.android:id/productTV")).Text;
+        Assert.That(tituloProduto, Is.EqualTo("Sauce Labs Backpack"));
 
-    ITouchAction touchAction = new ITouchAction(driver); 
-        touchAction.Press(469, 1964);
-        touchAction.MoveTo(494, 788);
+        // Exemplo com 1 linha
+        // Assert.That(driver.FindElement(MobileBy.Id("com.saucelabs.mydemoapp.android:id/productTV")).Text, Is.EqualTo("Sauce Labs Back Packs")); 
+
+        // Verificar o preco do produto
+        String precoProduto = driver.FindElement(MobileBy.Id("com.saucelabs.mydemoapp.android:id/priceTV")).Text;
+        Assert.That(precoProduto, Is.EqualTo("$ 29.99"));
+
+        // Arrasta para cima
+        TouchAction touchAction = new TouchAction(driver); // instancia objeto para reproduzir gestos
+        touchAction.Press(600, 1700);
+        touchAction.MoveTo(600, 700);
         touchAction.Release();
         touchAction.Perform();
 
-    driver.FindElement(MobileBy.AccessibilityId("Tap to add product to cart")).Click();
-    driver.FindElement(MobileBy.AccessibilityId("Tap to add product to cart")).Click();
+        // Adicionar no carrinho
+        driver.FindElement(MobileBy.AccessibilityId("Tap to add product to cart")).Click();
 
-    tituloProduto = driver.FindElement(MobileBy.Id("com.saucelabs.mydemoapp.android:id/cartIV")).Text;
-    Assert.That(tituloProduto, Is.EqualTo("Sauce Labs Backpack"));
+        // Clicar no carrinho
+        driver.FindElement(MobileBy.Id("com.saucelabs.mydemoapp.android:id/cartTV")).Click();
 
-    quantidadeCarrinho = driver.FindElement(MobileBy.Id("com.saucelabs.mydemoapp.android:id/itemsTV")).Text;
-    Assert.That(quantidadeCarrinho, IsEqualTo(2));
+        // Validar o nome do produto no carrinho
+        tituloProduto = driver.FindElement(MobileBy.Id("com.saucelabs.mydemoapp.android:id/cartIV")).Text;
+        Assert.That(tituloProduto, Is.EqualTo("Sauce Labs Backpack"));
 
-    precoProduto = driver.FindElement(MobileBy.Id("com.saucelabs.mydemoapp.android:id/totalPriceTV")).Text;
-     Assert.That(precoProduto, Is.EqualTo("$ 59.98"));
- }
+        // Validar o preco do produto no carrinho
+        precoProduto = driver.FindElement(MobileBy.Id("com.saucelabs.mydemoapp.android:id/priceTV")).Text;
+        Assert.That(precoProduto, Is.EqualTo("$ 29.99"));
 
-
+    }
 
 }
