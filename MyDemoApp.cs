@@ -1,7 +1,9 @@
+using NUnit.Framework;
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Android;
 using OpenQA.Selenium.Appium.Enums;
 using OpenQA.Selenium.Appium.Interfaces;
+using OpenQA.Selenium.Appium.MultiTouch;
 
 
 namespace appium;
@@ -27,7 +29,7 @@ public class MyDemoApp
         options.AddAdditionalCapability("appActivity", "com.saucelabs.mydemoapp.android.view.activities.SplashActivity");
         options.AddAdditionalCapability("newCommandTimeout", 90); 
  
-        driver = new AndroidDriver<AndroidElement>(remoteAddres:URI, driverOptions: options, commandTimeout: timeSpan.FromSeconds(180));
+        driver = new AndroidDriver<AndroidElement>(remoteAddress:URI, driverOptions: options, commandTimeout: TimeSpan.FromSeconds(180));
   }
 
    [TearDown] 
@@ -40,7 +42,7 @@ public class MyDemoApp
   [Test]
 public void AddBackPack()
   {
-   driver.FindElement(MobileBy.AndroidUIAutomator("new UiSelector().resourceId(\"com.saucelabs.mydemoapp.android:id/productIV\").instance(0)"));.Click(); 
+   driver.FindElement(MobileBy.AndroidUIAutomator("new UiSelector().resourceId(\"com.saucelabs.mydemoapp.android:id/productIV\").instance(0)")).Click(); 
 
    String tituloProduto = driver.FindElement(MobileBy.Id("com.saucelabs.mydemoapp.android:id/productTV")).Text;
    Assert.That(tituloProduto, Is.EqualTo("Sauce Labs Backpack"));
@@ -48,11 +50,11 @@ public void AddBackPack()
    String precoProduto = driver.FindElement(MobileBy.Id("com.saucelabs.mydemoapp.android:id/priceTV")).Text;
    Assert.That(precoProduto, Is.EqualTo("$ 29.99"));
 
-    ITouchAction touchAction = new ITouchAction(driver); 
-        touchAction.Press(469, 1964);
-        touchAction.MoveTo(494, 788);
-        touchAction.Release();
-        touchAction.Perform();
+    TouchAction touchAction = new TouchAction(driver);
+    touchAction.Press(469, 1964);
+    touchAction.MoveTo(494, 788);
+    touchAction.Release();
+    touchAction.Perform();
 
     driver.FindElement(MobileBy.AccessibilityId("Tap to add product to cart")).Click();
     driver.FindElement(MobileBy.AccessibilityId("Tap to add product to cart")).Click();
@@ -60,8 +62,8 @@ public void AddBackPack()
     tituloProduto = driver.FindElement(MobileBy.Id("com.saucelabs.mydemoapp.android:id/cartIV")).Text;
     Assert.That(tituloProduto, Is.EqualTo("Sauce Labs Backpack"));
 
-    quantidadeCarrinho = driver.FindElement(MobileBy.Id("com.saucelabs.mydemoapp.android:id/itemsTV")).Text;
-    Assert.That(quantidadeCarrinho, IsEqualTo(2));
+    string quantidadeCarrinho = driver.FindElement(MobileBy.Id("com.saucelabs.mydemoapp.android:id/itemsTV")).Text;
+    Assert.That(quantidadeCarrinho, Is.EqualTo("2"));
 
     precoProduto = driver.FindElement(MobileBy.Id("com.saucelabs.mydemoapp.android:id/totalPriceTV")).Text;
      Assert.That(precoProduto, Is.EqualTo("$ 59.98"));
