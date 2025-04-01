@@ -1,0 +1,5 @@
+C:\iterasys\MyDemoApp\obj\Debug\net9.0\MyDemoApp.csproj.AssemblyReference.cache
+C:\iterasys\MyDemoApp\obj\Debug\net9.0\MyDemoApp.GeneratedMSBuildEditorConfig.editorconfig
+C:\iterasys\MyDemoApp\obj\Debug\net9.0\MyDemoApp.AssemblyInfoInputs.cache
+C:\iterasys\MyDemoApp\obj\Debug\net9.0\MyDemoApp.AssemblyInfo.cs
+C:\iterasys\MyDemoApp\obj\Debug\net9.0\MyDemoApp.csproj.CoreCompileInputs.cache
