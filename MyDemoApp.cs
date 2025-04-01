@@ -13,6 +13,7 @@ public class MyDemoApp
   public static string SAUCE_USERNAME = Environment.GetEnvironmentVariable("SAUCE_USERNAME");
   public static string SAUCE_ACCES_KEY = Environment.GetEnvironmentVariable("SAUCE_ACCES_KEY");
   public Uri URI = new Uri($"https://{SAUCE_USERNAME}:{SAUCE_ACCES_KEY}@ondemand.us-west-1.saucelabs.com:443/wd/hub");
+  public AndroidDriver<AndroidElement> driver {get; set; }
 
   [SetUp]
    public void mobileSetup()
@@ -25,9 +26,9 @@ public class MyDemoApp
         options.AddAdditionalCapability("appPackage", "com.saucelabs.mydemoapp.android");
         options.AddAdditionalCapability("appActivity", "com.saucelabs.mydemoapp.android.view.activities.SplashActivity");
         options.AddAdditionalCapability("newCommandTimeout", 90); 
- }
-
- driver = new AndroidDriver<AndroidElement>(remoteAddres:URI, driverOptions: options, commandTimeout: timeSpan.FromSeconds(180));
+ 
+        driver = new AndroidDriver<AndroidElement>(remoteAddres:URI, driverOptions: options, commandTimeout: timeSpan.FromSeconds(180));
+  }
 
    [TearDown] 
     public void Finalizar()
